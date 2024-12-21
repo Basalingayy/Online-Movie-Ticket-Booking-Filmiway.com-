@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Seat Booking - Login</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.prima.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-image: url('img/cinema-background.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 50px;
+        }
+        .login-section {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-section h2 {
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+        .form-control {
+            background-color: #333;
+            color: #fff;
+            border: none;
+        }
+        .form-control:focus {
+            background-color: #444;
+            color: #fff;
+        }
+        .btn-primary {
+            background-color: #ffcc00;
+            border-color: #ffcc00;
+            color: #000;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #ff9900;
+            border-color: #ff9900;
+        }
+        #mainContent, #seatSelection, #ticket-info {
+            display: none;
+        }
+/* Add CSS for the seat layout */
+#seatsContainer {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr); /* 10 seats per row */
+    gap: 8px; /* Add some spacing between seats */
+    max-width: 600px; /* Optional, to center the seats */
+    margin: auto;
+}
+
+.seat {
+    width: 40px;
+    height: 40px;
+    background-color: #4cd9ef;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.seat.selected {
+    background-color: #6c6;
+}
+
+.seat.premium {
+    background-color: #ffd700;
+}
+
+.seat.standard {
+    background-color: #4cd9ef;
+}
+
+.seat.budget {
+    background-color: #98fb98;
+}
+
+.seat-legend {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+
+    
+        #mainContent {
+            display: none;
+        }
+        .sponsor-section {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .sponsor-section img {
+            width: 150px;
+            margin: 0 20px;
+        }
+        .contact-us, .refund-info {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin-top: 20px;
+            color: hsl(34, 100%, 50%);
+            text-align: center;
+            border-radius: 10px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .scrolling-text {
+            white-space: nowrap;
+            overflow-x: hidden;
+            animation: scroll-text 10s linear infinite;
+        }
+        @keyframes scroll-text {
+            from { transform: translateX(80%); }
+            to { transform: translateX(-80%); }
+        }
+        .review-section {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            color: #fff;
+        }
+        .review-section h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        .review-textarea {
+            width: 100%;
+            height: 100px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        .review-btn {
+            background-color: #ffcc00;
+            border-color: #ffcc00;
+            color: #000;
+            font-weight: bold;
+        }
+        .review-btn:hover {
+            background-color: #ff9900;
+            border-color: #ff9900;
+        }
+        .reviews-list {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+        }
+        .review-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #444;
+            border-radius: 5px;
+        }
+
+        h2 {
+            color: #ffcc00;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-control, select {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            height: 40px;
+            width: 100%;
+        }
+        .form-control:focus, select:focus {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #ffcc00;
+        }
+        label {
+            color: #ffcc00;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: #ffcc00;
+            border-color: #ffcc00;
+            color: #000;
+            font-weight: bold;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #ff9900;
+            border-color: #ff9900;
+        }
+        .selectionForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .selectionForm .form-group, .selectionForm .form-control, .selectionForm select {
+            width: 100%; /* Ensures all elements in the form have the same width */
+        }
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #121212;
+        }
+        
+        body.dark-mode .container {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        
+        body.dark-mode .form-control {
+            background-color: #222;
+            color: #fff;
+        }
+        
+        #darkModeToggle {
+            margin-bottom: 20px;
+        }
+        .rating {
+            font-size: 24px;
+            color: #ddd;
+            margin: 10px 0;
+        }
+
+        .star {
+            cursor: pointer;
+        }
+
+        .star.active {
+            color: #ffcc00;
+        }
+
+        .developer-credit {
+            color: #ffcc00;
+            font-style: italic;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .developer-name {
+            color: #00ff00; /* Bright green highlight for name */
+            font-weight: bold;
+        }
+
+        .github-link {
+            color: #00ffff; /* Cyan color for GitHub link */
+            text-decoration: none;
+            margin-left: 10px;
+        }
+
+        .github-link:hover {
+            text-decoration: underline;
+            color: #66ffff;
+        }
+
+        .search-results {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .search-result-item {
+            padding: 10px;
+            cursor: pointer;
+            color: #fff;
+        }
+        
+        .search-result-item:hover {
+            background: rgba(255, 204, 0, 0.2);
+        }
+
+        .screen-container {
+            perspective: 1000px;
+            margin-bottom: 30px;
+        }
+        
+        .screen {
+            background: rgba(255, 204, 0, 0.3);
+            height: 70px;
+            width: 100%;
+            margin: 15px 0;
+            transform: rotateX(-45deg);
+            box-shadow: 0 3px 10px rgba(255, 204, 0, 0.7);
+            text-align: center;
+            line-height: 70px;
+            color: #fff;
+            font-size: 2em;
+        }
+
+        .price-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .running-total {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .timer-display {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .seat-preview {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1000;
+            transform: translateY(-120%);
+            min-width: 120px;
+            border: 1px solid #ffcc00;
+        }
+
+        .preview-content {
+            color: #fff;
+            text-align: center;
+        }
+
+        .preview-content p {
+            margin: 5px 0;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loader-content {
+            text-align: center;
+            color: #fff;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ffcc00;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .movie-update-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 204, 0, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #000;
+        }
+
+        .notification-content button {
+            background: none;
+            border: none;
+            color: #000;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .error-field {
+            border: 2px solid #ff4444 !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .warning-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .warning-content {
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+            color: #fff;
+            text-align: center;
+            border: 2px solid #ffcc00;
+        }
+
+        .warning-header {
+            margin-bottom: 20px;
+        }
+
+        .warning-header i {
+            color: #ffcc00;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .warning-header h3 {
+            color: #ffcc00;
+            margin: 10px 0;
+        }
+
+        .warning-body ul {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .warning-body li {
+            padding: 5px 0;
+            color: #ff4444;
+        }
+
+        .warning-body li::before {
+            content: "•";
+            color: #ffcc00;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .review-form {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .rating-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .stars {
+            font-size: 24px;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .stars .star {
+            transition: color 0.2s;
+        }
+
+        .stars .star:hover,
+        .stars .star.active {
+            color: #ffcc00;
+        }
+
+        .rating-text {
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .reviews-stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .overall-rating {
+            text-align: center;
+        }
+
+        .big-rating {
+            font-size: 48px;
+            color: #ffcc00;
+        }
+
+        .rating-bars {
+            flex-grow: 1;
+            margin-left: 30px;
+        }
+
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+
+        .bar-container {
+            flex-grow: 1;
+            background: #444;
+            height: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            background: #ffcc00;
+            transition: width 0.3s ease;
+        }
+
+        .reviews-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .review-item {
+            position: relative;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+
+        .review-item:hover {
+            transform: translateX(10px);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .review-rating {
+            color: #ffcc00;
+        }
+
+        .review-date {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .review-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 204, 0, 0.2);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .review-author {
+            font-weight: bold;
+            color: #ffcc00;
+        }
+
+        .review-meta {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .review-rating {
+            color: #ffcc00;
+            letter-spacing: 2px;
+        }
+
+        .review-date {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .review-movie {
+            color: #fff;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .review-text {
+            color: #fff;
+            line-height: 1.5;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 5px;
+            color: #fff;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            background-color: rgba(40, 167, 69, 0.9);
+        }
+
+        .notification.error {
+            background-color: rgba(220, 53, 69, 0.9);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .booking-history {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item .booking-details {
+            flex-grow: 1;
+        }
+
+        .history-item .booking-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-upcoming { color: #4CAF50; }
+        .status-past { color: #9E9E9E; }
+        .status-cancelled { color: #F44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center">
+            <h1>filmiyway.com</h1>
+            <p class="developer-credit">
+                Developed by <span class="developer-name">Basalingayya Saraganachari</span>
+                <a href="https://github.com/Basalingayy" class="github-link" target="_blank">
+                    <i class="fab fa-github"></i> @Basalingayy
+                </a>
+            </p>
+        </div>
+        <!-- Login Section -->
+        <div class="login-section" id="login-section">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Phone Number / Email:</label>
+                    <input type="text" id="loginUsername" class="form-control" placeholder="Enter Your Phone Number / Email" required="required"/>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Enter Your Password" required="required"/>
+                </div>
+                 <button type="submit" class="btn btn-primary btn-lg">Login</button>
+            </form>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent">
+            <div class="text-center">
+                <label id='title'>MOVIE SEAT BOOKING</label>
+            </div>
+            <form class='form-inline selectionForm'>
+                <div class="form-group required">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" id='name' placeholder="Your Name" required="required"/>
+                </div>
+                <div class="form-group required">
+                    <label for="movie">Movie:</label>
+                    <select id="movie" class="form-control" required="required">
+                        <option value="">Select Movie</option>
+                        <option value="Pushpa2" data-price="300">Pushpa 2: The Rule ₹300</option>
+                        <option value="Kalki2898AD" data-price="350">Kalki 2898 AD ₹350</option>
+                        <option value="Devara" data-price="300">Devara: Part 1 ₹300</option>
+                        <option value="Salar" data-price="350">Salaar: Part 1 - Ceasefire ₹350</option>
+                        <option value="Welcome To The Jungle" data-price="250">Welcome To The Jungle ₹250</option>
+                        <option value="Chandu Champion" data-price="250">Chandu Champion ₹250</option>
+                        <option value="Jigra" data-price="250">Jigra ₹250</option>
+                        <option value="KGF" data-price="300">KGF ₹300</option>
+                        <option value="Kanthara" data-price="250">Kanthara ₹250</option>
+                    </select>
+                </div>
+
+                <div class="form-group required">
+                    <label for="showtime">Show Time:</label>
+                    <select id="showtime" class="form-control" required="required">
+                        <option value="">Select Show Time</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="01:00 PM">01:00 PM</option>
+                        <option value="04:00 PM">04:00 PM</option>
+                        <option value="07:00 PM">07:00 PM</option>
+                    </select>
+                </div>
+                <div class="form-group required">
+                    <label for="seats">Number Of Seats:</label>
+                    <input type="number" id='seats' class="form-control" placeholder="Enter Seats" required="required"/>
+                </div>
+                <div class="form-group required">
+                    <label for="date">Date:</label>
+                    <input type="date" id='date' class="form-control" required="required"/>
+                </div>
+                <div class="form-group required">
+                    <label for="food">Food:</label>
+                    <select id="food" class="form-control">
+                        <option value="">Select Food</option>
+                        <option value="Popcorn" data-price="150">Popcorn - ₹150</option>
+                        <option value="Coca-Cola" data-price="100">Coca-Cola - ₹100</option>
+                        <option value="Nachos" data-price="200">Nachos - ₹200</option>
+                        <option value="None" data-price="0">None</option>
+                    </select>
+                </div>
+                <div class="form-group required">
+                    <label for="place">Place:</label>
+                    <select id="place" class="form-control">
+                        <option value="">Select Place</option>
+                        <option value="Bangalore">Bangalore</option>
+                        <option value="Mysore">Mysore</option>
+                        <option value="Hubli">Hubli</option>
+                        <option value="Dharwad">Dharwad</option>
+                    </select>
+                </div>
+
+                <div class="text-center">
+                    <button type="button" class="btn btn-primary btn-lg submitBtn" id="startSelecting">Start Selecting</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Seat Selection Section -->
+        <div id="seatSelection">
+            <h3>Select Your Seats</h3>
+            <div class="screen-container">
+                <div class="screen">SCREEN</div>
+            </div>
+            <div class="seat-container" id="seatsContainer"></div>
+            <div class="seat-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffd700;"></div>
+                    <span>Premium (₹400)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #4cd9ef;"></div>
+                    <span>Standard (₹300)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #98fb98;"></div>
+                    <span>Budget (₹200)</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="button" class="btn btn-primary btn-lg" id="confirmSeats">Confirm Selection</button>
+            </div>
+        </div>
+
+        <!-- Ticket Info Section -->
+        <div class="table-responsive" id="ticket-info">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Movie</th>
+                        <th>Name</th>
+                        <th>Number of Seats</th>
+                        <th>Date</th>
+                        <th>Show Time</th>
+                        <th>Seats</th>
+                        <th>Total Price</th>
+                        <th>Food</th>
+                        <th>Place</th>
+                    </tr>
+                </thead>
+                <tbody id="ticket-sold-info"></tbody>
+            </table>
+            <div class="text-center">
+                <button type="button" class="btn btn-primary btn-lg" id="downloadTicket">Download Ticket</button>
+            </div>
+        </div>
+    </div>
+                <!-- Review Section -->
+                <div class="review-section">
+                    <h3>Leave a Review</h3>
+                    <input type="text" id="reviewName" class="form-control" placeholder="Your Name" required>
+                    <select id="reviewMovie" class="form-control" required>
+                        <option value="">Select Movie</option>
+                        <option value="Pushpa2">Pushpa2</option>
+                        <option value="KGF">KGF</option>
+                        <option value="Kanthara">Kanthara</option>
+                    </select>
+                    <textarea id="reviewText" class="form-control" placeholder="Write your review here..." required></textarea>
+                    <button type="button" class="btn btn-primary review-btn" id="submitReview">Submit Review</button>
+                    <div class="reviews-list" id="reviewsList"></div>
+                    <div class="rating">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+                </div>
+
+    
+        <div class="sponsor-section">
+            <h3>Sponsors:</h3>
+            <div class="scrolling-text">
+                <img src="img/sponsor1.png" alt="Sponsor 1">
+                <img src="img/sponsor2.png" alt="Sponsor 2">
+               
+            </div>
+        </div>
+    
+        <div class="contact-us">
+            <p>Contact us at: <a href="mailto:support@filmiyway.com">support@filmiyway.com</a></p>
+        </div>
+    
+        <div class="refund-info">
+            <h4>Refund Policy:</h4>
+            <p>Refund requests are processed within 1 hour of booking. Terms and conditions apply.</p>
+            </div>
+
+    <div class="booking-history" id="bookingHistory" style="display: none;">
+        <h3>Your Booking History</h3>
+        <div class="history-filters">
+            <select id="historyFilter">
+                <option value="all">All Bookings</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="past">Past</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="history-list" id="historyList"></div>
+    </div>
+
+    <script>
+        // Replace the existing speakMessage function with this corrected version
+        function speakMessage(message) {
+            // Check if speech synthesis is supported
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(message);
+                // Get available voices
+                let voices = window.speechSynthesis.getVoices();
+                
+                // Some browsers need a small delay to load voices
+                if (voices.length === 0) {
+                    window.speechSynthesis.addEventListener('voiceschanged', () => {
+                        voices = window.speechSynthesis.getVoices();
+                        utterance.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
+                    });
+                } else {
+                    utterance.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
+                }
+                
+                utterance.rate = 1.0;  // Speed of speech (0.1 to 10)
+                utterance.pitch = 1.0; // Pitch of voice (0 to 2)
+                utterance.volume = 1.0; // Volume (0 to 1)
+                
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+                
+                // Speak the new message
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log('Speech synthesis not supported');
+            }
+        }
+
+        // Handle login form submission
+// Login functionality
+document.addEventListener("DOMContentLoaded", function () {
+    // Handle Login Form
+    const loginForm = document.getElementById("loginForm");
+    const loginSection = document.getElementById("login-section");
+    const mainContent = document.getElementById("mainContent");
+
+    loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const phoneNumberOrEmail = document.getElementById("loginUsername").value;
+        const password = document.getElementById("loginPassword").value;
+
+        if (phoneNumberOrEmail && password) {
+            loginSection.style.display = "none";
+            mainContent.style.display = "block";
+            speakMessage("Welcome to Filmiyway! You have successfully logged in.");
+        } else {
+            speakMessage("Please enter both phone number or email and password.");
+            alert("Please enter both phone number/email and password.");
+        }
+    });
+
+    // Seat selection and ticket info handling
+    const seatsContainer = document.getElementById("seatsContainer");
+    const confirmSeatsButton = document.getElementById("confirmSeats");
+    const seatSelectionSection = document.getElementById("seatSelection");
+    const ticketInfoSection = document.getElementById("ticket-info");
+
+    // Generate seat grid dynamically (50 seats for the cinema hall)
+    for (let i = 1; i <= 50; i++) {
+        const seat = document.createElement("div");
+        seat.classList.add("seat");
+        seat.textContent = i;
+        seat.dataset.seatNumber = i;
+        
+        // Add price categories
+        if (i <= 10) {
+            seat.classList.add("premium");
+            seat.dataset.price = 400;
+        } else if (i <= 30) {
+            seat.classList.add("standard");
+            seat.dataset.price = 300;
+        } else {
+            seat.classList.add("budget");
+            seat.dataset.price = 200;
+        }
+        
+        seat.addEventListener("click", function() {
+            seat.classList.toggle("selected");
+        });
+        seatsContainer.appendChild(seat);
+    }
+
+    // Show seat selection after form submission
+    document.getElementById("startSelecting").addEventListener("click", function () {
+        seatSelectionSection.style.display = "block";
+        mainContent.style.display = "none";
+        speakMessage("Please select your seats. Click on the seats you want to book.");
+    });
+
+    // Confirm seat selection and display ticket info
+    confirmSeatsButton.addEventListener("click", function () {
+        const selectedSeats = document.querySelectorAll(".seat.selected");
+        if (selectedSeats.length === 0) {
+            speakMessage("Please select at least one seat before confirming.");
+            return;
+        }
+        
+        const seats = Array.from(selectedSeats).map(seat => seat.dataset.seatNumber).join(", ");
+        const movie = document.getElementById("movie").value;
+        const name = document.getElementById("name").value;
+        const numberOfSeats = document.getElementById("seats").value;
+        const date = document.getElementById("date").value;
+        const showTime = document.getElementById("showtime").value;
+        const food = document.getElementById("food").value;
+        const place = document.getElementById("place").value;
+        const foodPrice = document.querySelector(`#food option[value="${food}"]`)?.dataset?.price || 0;
+        const moviePrice = document.querySelector(`#movie option[value="${movie}"]`)?.dataset?.price || 0;
+        const totalPrice = (parseInt(moviePrice) + parseInt(foodPrice)) * numberOfSeats;
+
+        // Display ticket info
+        const ticketInfoRow = document.createElement("tr");
+        ticketInfoRow.innerHTML = `
+            <td>${movie}</td>
+            <td>${name}</td>
+            <td>${numberOfSeats}</td>
+            <td>${date}</td>
+            <td>${showTime}</td>
+            <td>${seats}</td>
+            <td>₹${totalPrice}</td>
+            <td>${food}</td>
+            <td>${place}</td>
+        `;
+        document.getElementById("ticket-sold-info").appendChild(ticketInfoRow);
+
+        // Hide seat selection and show ticket info
+        seatSelectionSection.style.display = "none";
+        ticketInfoSection.style.display = "block";
+
+        // Send ticket information to backend for SMS or other purposes
+        const ticketInfo = {
+            movie,
+            name,
+            seats,
+            showTime,
+            date,
+            food,
+            place,
+            totalPrice,
+            phoneNumber: document.getElementById("phoneNumber").value // Assuming there's a phone number field
+        };
+
+        // Sending data to backend via POST request
+       // Sending data to backend via POST request
+fetch('/sendTicketInfo', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(ticketInfo)
+})
+.then(response => response.json())
+.then(data => {
+    console.log('Server Response:', data); // Debug: Check the server's response
+    if (data.message === 'SMS sent successfully') {
+        alert('Ticket information sent to your phone!');
+    } else {
+        alert('Error sending SMS: ' + data.error);
+    }
+})
+.catch(error => {
+    console.error('Error sending SMS:', error);
+    alert('Failed to send ticket information. Please try again later.');
+});
+
+        speakMessage(`Booking confirmed! You have selected ${selectedSeats.length} seats. Your total price is ${totalPrice} rupees.`);
+    });
+
+    // Handle ticket download
+    document.getElementById("downloadTicket").addEventListener("click", function () {
+        // Get the ticket information from the table
+        const ticketRow = document.querySelector("#ticket-sold-info tr");
+        if (!ticketRow) {
+            alert("No ticket information found!");
+            return;
+        }
+
+        const ticketInfo = {
+            movie: ticketRow.cells[0].textContent,
+            name: ticketRow.cells[1].textContent,
+            seats: ticketRow.cells[2].textContent,
+            date: ticketRow.cells[3].textContent,
+            showTime: ticketRow.cells[4].textContent,
+            seatNumbers: ticketRow.cells[5].textContent,
+            totalPrice: ticketRow.cells[6].textContent,
+            food: ticketRow.cells[7].textContent,
+            place: ticketRow.cells[8].textContent
+        };
+
+        // Create PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Add movie ticket styling
+        doc.setFillColor(40, 40, 40);
+        doc.rect(0, 0, 210, 297, 'F');
+
+        // Add header
+        doc.setTextColor(255, 204, 0); // Golden yellow color
+        doc.setFontSize(24);
+        doc.text('FILMIYWAY.COM', 105, 20, { align: 'center' });
+        doc.setFontSize(18);
+        doc.text('Movie Ticket', 105, 30, { align: 'center' });
+
+        // Add developer name in the PDF header
+
+
+        // Add ticket details
+        doc.setFontSize(12);
+        doc.setTextColor(255, 255, 255); // White color
+
+        const startY = 50;
+        const lineHeight = 10;
+        
+        doc.text(`Movie: ${ticketInfo.movie}`, 20, startY);
+        doc.text(`Name: ${ticketInfo.name}`, 20, startY + lineHeight);
+        doc.text(`Date: ${ticketInfo.date}`, 20, startY + lineHeight * 2);
+        doc.text(`Show Time: ${ticketInfo.showTime}`, 20, startY + lineHeight * 3);
+        doc.text(`Seat Numbers: ${ticketInfo.seatNumbers}`, 20, startY + lineHeight * 4);
+        doc.text(`Total Price: ${ticketInfo.totalPrice}`, 20, startY + lineHeight * 5);
+        doc.text(`Food Order: ${ticketInfo.food}`, 20, startY + lineHeight * 6);
+        doc.text(`Venue: ${ticketInfo.place}`, 20, startY + lineHeight * 7);
+
+        // Generate QR code
+        const qr = qrcode(0, 'M');
+        qr.addData(JSON.stringify(ticketInfo));
+        qr.make();
+        const qrImage = qr.createDataURL();
+        doc.addImage(qrImage, 'PNG', 140, startY, 40, 40);
+
+        // Add developer credit in footer
+        doc.setFontSize(10);
+        doc.text('Thank you for booking with Filmiyway!', 105, 250, { align: 'center' });
+        doc.text('Please show this ticket at the entrance', 105, 257, { align: 'center' });
+        doc.text('Contact: support@filmiyway.com', 105, 264, { align: 'center' });
+        doc.setTextColor(0, 255, 0); // Bright green color
+        doc.text('Developed by Basalingayya Saraganachari', 105, 271, { align: 'center' });
+        doc.setTextColor(0, 255, 255); // Cyan color
+        doc.text('GitHub: @Basalingayy', 105, 276, { align: 'center' });
+
+        // Add terms and conditions
+        doc.setFontSize(8);
+        doc.text('Terms & Conditions:', 20, 280);
+        doc.text('1. Please arrive 15 minutes before show time', 20, 285);
+        doc.text('2. Outside food and beverages are not allowed', 20, 290);
+
+        // Save the PDF
+        const ticketFileName = `${ticketInfo.movie}_${ticketInfo.date}_ticket.pdf`;
+        doc.save(ticketFileName);
+
+        // Speak confirmation message
+        speakMessage("Your ticket has been downloaded successfully. Please check your downloads folder.");
+    });
+
+    // Handle review submission
+    const reviewName = document.getElementById("reviewName");
+    const reviewMovie = document.getElementById("reviewMovie");
+    const reviewText = document.getElementById("reviewText");
+    const reviewsList = document.getElementById("reviewsList");
+
+    document.getElementById("submitReview").addEventListener("click", function () {
+        const name = reviewName.value;
+        const movie = reviewMovie.value;
+        const review = reviewText.value;
+
+        if (name && movie && review) {
+            const reviewItem = document.createElement("div");
+            reviewItem.classList.add("review-item");
+            reviewItem.innerHTML = `
+                <strong>${name} (Movie: ${movie})</strong>
+                <p>${review}</p>
+            `;
+            reviewsList.appendChild(reviewItem);
+            reviewName.value = '';
+            reviewMovie.value = '';
+            reviewText.value = '';
+            speakMessage("Thank you for submitting your review!");
+        } else {
+            speakMessage("Please fill all the fields to submit your review.");
+            alert("Please fill all the fields to submit your review.");
+        }
+    });
+
+    // Add voice feedback for seat clicking
+    seatsContainer.addEventListener("click", function(event) {
+        if (event.target.classList.contains("seat")) {
+            const seatNumber = event.target.dataset.seatNumber;
+            if (event.target.classList.contains("selected")) {
+                speakMessage(`Seat ${seatNumber} selected`);
+            } else {
+                speakMessage(`Seat ${seatNumber} unselected`);
+            }
+        }
+    });
+
+    // Add voice alert for movie selection
+    document.getElementById("movie").addEventListener("change", function(e) {
+        if (e.target.value) {
+            const selectedMovie = e.target.options[e.target.selectedIndex].text;
+            speakMessage(`You have selected ${selectedMovie}`);
+        }
+    });
+
+    // Add voice alert for showtime selection
+    document.getElementById("showtime").addEventListener("change", function(e) {
+        if (e.target.value) {
+            speakMessage(`Show time selected: ${e.target.value}`);
+        }
+    });
+});
+
+// Add this after the startSelecting click handler
+let timeLeft = 300; // 5 minutes
+let countdownTimer;
+
+function startCountdown() {
+    const timerDisplay = document.createElement('div');
+    timerDisplay.id = 'timer';
+    timerDisplay.className = 'alert alert-warning text-center';
+    document.getElementById('seatSelection').prepend(timerDisplay);
+
+    countdownTimer = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        if (timeLeft === 60) {
+            speakMessage("One minute remaining to complete your selection");
+        }
+        
+        if (timeLeft === 0) {
+            clearInterval(countdownTimer);
+            seatSelectionSection.style.display = 'none';
+            mainContent.style.display = 'block';
+            speakMessage("Time's up! Please start your selection again");
+            alert("Time's up! Please start your selection again");
+        }
+        timeLeft--;
+    }, 1000);
+}
+
+// Add this to your startSelecting click handler
+document.getElementById("startSelecting").addEventListener("click", function() {
+    // ... existing code ...
+    timeLeft = 300;
+    startCountdown();
+});
+
+// Add this before the ticket confirmation
+function showBookingSummary(ticketInfo) {
+    const summary = document.createElement('div');
+    summary.className = 'modal fade show';
+    summary.style.display = 'block';
+    summary.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Booking Summary</h5>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Movie:</strong> ${ticketInfo.movie}</p>
+                    <p><strong>Show Time:</strong> ${ticketInfo.showTime}</p>
+                    <p><strong>Date:</strong> ${ticketInfo.date}</p>
+                    <p><strong>Seats:</strong> ${ticketInfo.seats}</p>
+                    <p><strong>Food:</strong> ${ticketInfo.food}</p>
+                    <p><strong>Total Price:</strong> ₹${ticketInfo.totalPrice}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Edit</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmBooking(ticketInfo)">Confirm Booking</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(summary);
+}
+
+document.querySelectorAll('.star').forEach(star => {
+    star.addEventListener('click', function() {
+        const rating = this.dataset.rating;
+        document.querySelectorAll('.star').forEach(s => {
+            s.classList.toggle('active', s.dataset.rating <= rating);
+        });
+    });
+});
+
+// Add this in your script section
+function addBookingTimer() {
+    const timerDiv = document.createElement('div');
+    timerDiv.className = 'booking-timer';
+    let timeLeft = 600; // 10 minutes
+    
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDiv.innerHTML = `
+            <div class="timer-display">
+                Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}
+            </div>
+        `;
+        
+        if (timeLeft === 300) { // 5 minutes warning
+            speakMessage("5 minutes remaining to complete your booking");
+        }
+        
+        if (timeLeft === 0) {
+            clearInterval(timer);
+            alert("Booking session expired!");
+            window.location.reload();
+        }
+        timeLeft--;
+    }
+    
+    const timer = setInterval(updateTimer, 1000);
+    document.querySelector('#mainContent').prepend(timerDiv);
+}
+
+// Add this to your script section
+function updateTotalPrice() {
+    const selectedSeats = document.querySelectorAll('.seat.selected');
+    let total = 0;
+    
+    selectedSeats.forEach(seat => {
+        const seatType = seat.classList.contains('premium') ? 'premium' : 
+                        seat.classList.contains('standard') ? 'standard' : 'budget';
+        const price = seatType === 'premium' ? 400 : 
+                     seatType === 'standard' ? 300 : 200;
+        total += price;
+    });
+    
+    const food = document.getElementById('food').value;
+    const foodPrice = document.querySelector(`#food option[value="${food}"]`)?.dataset?.price || 0;
+    total += parseInt(foodPrice);
+    
+    document.getElementById('totalPrice').textContent = `Total: ₹${total}`;
+}
+
+function applyPromoCode() {
+    const promoCode = document.getElementById('promoCode').value.toUpperCase();
+    const validCodes = {
+        'FIRST10': 10,
+        'SPECIAL20': 20,
+        'WEEKEND': 15
+    };
+    
+    if (validCodes[promoCode]) {
+        const discount = validCodes[promoCode];
+        alert(`Promo code applied! ${discount}% discount`);
+        // Apply discount to total price
+        const currentTotal = parseInt(document.getElementById('totalPrice').textContent.replace('₹', ''));
+        const discountedTotal = currentTotal * (1 - discount/100);
+        document.getElementById('totalPrice').textContent = `Total: ₹${Math.round(discountedTotal)}`;
+    } else {
+        alert('Invalid promo code!');
+    }
+}
+
+// Add this to your ticket confirmation logic
+function sendEmailConfirmation(ticketInfo) {
+    // Simulate email sending
+    console.log('Sending email confirmation...');
+    const emailContent = `
+        Thank you for booking with Filmiyway!
+        
+        Booking Details:
+        Movie: ${ticketInfo.movie}
+        Date: ${ticketInfo.date}
+        Time: ${ticketInfo.showTime}
+        Seats: ${ticketInfo.seats}
+        Total: ${ticketInfo.totalPrice}
+        
+        Your tickets have been attached to this email.
+        
+        Enjoy the show!
+        Team Filmiyway
+    `;
+    
+    alert('Booking confirmation sent to your email!');
+}
+
+// Add this to your script section
+function initializeSeatPriceDisplay() {
+    const priceDisplay = document.createElement('div');
+    priceDisplay.className = 'price-display';
+    priceDisplay.innerHTML = `
+        <div class="running-total">
+            <span>Selected Seats: <span id="seatCount">0</span></span>
+            <span>Subtotal: ₹<span id="seatSubtotal">0</span></span>
+            <span>Food: ₹<span id="foodTotal">0</span></span>
+            <span class="grand-total">Total: ₹<span id="grandTotal">0</span></span>
+        </div>
+    `;
+    document.getElementById('seatSelection').insertBefore(priceDisplay, document.getElementById('confirmSeats'));
+}
+
+// Add this function to your script
+function showBookingSummaryWithAnimation(ticketInfo) {
+    const summary = document.createElement('div');
+    summary.className = 'booking-summary animated';
+    summary.innerHTML = `
+        <div class="summary-content">
+            <h3>Booking Summary</h3>
+            <div class="summary-details">
+                <div class="summary-item">
+                    <i class="fas fa-film"></i>
+                    <span>${ticketInfo.movie}</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>${ticketInfo.date}</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-clock"></i>
+                    <span>${ticketInfo.showTime}</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-chair"></i>
+                    <span>Seats: ${ticketInfo.seats}</span>
+                </div>
+                <div class="summary-item">
+                    <i class="fas fa-utensils"></i>
+                    <span>${ticketInfo.food}</span>
+                </div>
+                <div class="summary-item total">
+                    <i class="fas fa-rupee-sign"></i>
+                    <span>${ticketInfo.totalPrice}</span>
+                </div>
+            </div>
+            <div class="summary-actions">
+                <button onclick="confirmBooking()" class="btn btn-success">Confirm</button>
+                <button onclick="editBooking()" class="btn btn-warning">Edit</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(summary);
+    
+    // Trigger animation
+    setTimeout(() => summary.classList.add('show'), 100);
+}
+
+// Movie fetching and updating functionality
+class MovieUpdater {
+    constructor() {
+        this.apiKey = 'YOUR_GOOGLE_API_KEY'; // You'll need to get this from Google Cloud Console
+        this.searchEndpoint = 'https://www.googleapis.com/customsearch/v1';
+        this.movieSelect = document.getElementById('movie');
+        this.lastUpdate = null;
+        this.updateInterval = 24 * 60 * 60 * 1000; // 24 hours
+    }
+
+    async fetchLatestMovies() {
+        try {
+            const response = await fetch(
+                `${this.searchEndpoint}?key=${this.apiKey}&cx=YOUR_SEARCH_ENGINE_ID&q=new movies in theaters 2024&num=10`
+            );
+            const data = await response.json();
+            return this.parseMovieData(data.items);
+        } catch (error) {
+            console.error('Error fetching movies:', error);
+            return [];
+        }
+    }
+
+    parseMovieData(items) {
+        return items.map(item => ({
+            title: item.title.split('-')[0].trim(),
+            price: this.generateRandomPrice(),
+            releaseDate: new Date().toISOString().split('T')[0]
+        }));
+    }
+
+    generateRandomPrice() {
+        const prices = [200, 250, 300, 350, 400];
+        return prices[Math.floor(Math.random() * prices.length)];
+    }
+
+    updateMovieList(movies) {
+        // Keep existing movies that are less than 30 days old
+        const existingOptions = Array.from(this.movieSelect.options)
+            .filter(option => option.value && option.dataset.added)
+            .filter(option => {
+                const addedDate = new Date(option.dataset.added);
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                return addedDate > thirtyDaysAgo;
+            });
+
+        // Clear current options except the first empty one
+        this.movieSelect.innerHTML = '<option value="">Select Movie</option>';
+
+        // Add existing movies back
+        existingOptions.forEach(option => this.movieSelect.appendChild(option));
+
+        // Add new movies
+        movies.forEach(movie => {
+            const exists = existingOptions.some(option => 
+                option.textContent.includes(movie.title)
+            );
+
+            if (!exists) {
+                const option = document.createElement('option');
+                option.value = movie.title;
+                option.textContent = `${movie.title} ₹${movie.price}`;
+                option.dataset.price = movie.price;
+                option.dataset.added = new Date().toISOString();
+                this.movieSelect.appendChild(option);
+            }
+        });
+    }
+
+    async checkForUpdates() {
+        const now = new Date();
+        if (!this.lastUpdate || (now - this.lastUpdate) > this.updateInterval) {
+            const movies = await this.fetchLatestMovies();
+            if (movies.length > 0) {
+                this.updateMovieList(movies);
+                this.lastUpdate = now;
+                this.showUpdateNotification(movies.length);
+            }
+        }
+    }
+
+    showUpdateNotification(count) {
+        const notification = document.createElement('div');
+        notification.className = 'movie-update-notification';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-film"></i>
+                <span>${count} new movies added!</span>
+                <button onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 5000);
+    }
+
+    startAutoUpdate() {
+        // Check for updates immediately
+        this.checkForUpdates();
+        // Then check periodically
+        setInterval(() => this.checkForUpdates(), this.updateInterval);
+    }
+}
+
+// Initialize the movie updater when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const movieUpdater = new MovieUpdater();
+    movieUpdater.startAutoUpdate();
+});
+
+// Add this function right after your existing script
+function validateBookingForm() {
+    const requiredFields = {
+        'name': 'Name',
+        'movie': 'Movie',
+        'showtime': 'Show Time',
+        'seats': 'Number of Seats',
+        'date': 'Date',
+        'place': 'Place'
+    };
+
+    let missingFields = [];
+    let isValid = true;
+
+    // Check each required field
+    for (let [fieldId, fieldName] of Object.entries(requiredFields)) {
+        const field = document.getElementById(fieldId);
+        if (!field.value.trim()) {
+            isValid = false;
+            missingFields.push(fieldName);
+            field.classList.add('error-field');
+        } else {
+            field.classList.remove('error-field');
+        }
+    }
+
+    // Additional date validation
+    const selectedDate = new Date(document.getElementById('date').value);
+    const today = new Date();
+    if (selectedDate < today) {
+        isValid = false;
+        alert('Please select a future date');
+        document.getElementById('date').classList.add('error-field');
+        return false;
+    }
+
+    // Additional seats validation
+    const seatsInput = document.getElementById('seats');
+    const numberOfSeats = parseInt(seatsInput.value);
+    if (numberOfSeats <= 0 || numberOfSeats > 10) {
+        isValid = false;
+        alert('Please select between 1 and 10 seats');
+        seatsInput.classList.add('error-field');
+        return false;
+    }
+
+    if (!isValid) {
+        showWarningModal(missingFields);
+        return false;
+    }
+
+    return true;
+}
+
+function showWarningModal(missingFields) {
+    const warningModal = document.createElement('div');
+    warningModal.className = 'warning-modal';
+    warningModal.innerHTML = `
+        <div class="warning-content">
+            <div class="warning-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Required Information Missing</h3>
+            </div>
+            <div class="warning-body">
+                <p>Please fill in the following required fields:</p>
+                <ul>
+                    ${missingFields.map(field => `<li>${field}</li>`).join('')}
+                </ul>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="btn btn-warning">
+                OK, I'll Complete
+            </button>
+        </div>
+    `;
+    document.body.appendChild(warningModal);
+    
+    // Add voice feedback
+    speakMessage(`Please fill in all required fields including ${missingFields.join(', ')}`);
+}
+
+// Update the startSelecting click handler
+document.getElementById("startSelecting").addEventListener("click", function() {
+    if (validateBookingForm()) {
+        seatSelectionSection.style.display = "block";
+        mainContent.style.display = "none";
+        speakMessage("Please select your seats. Click on the seats you want to book.");
+        timeLeft = 300;
+        startCountdown();
+    }
+});
+
+// Add this after your existing script
+function initializeReviewSystem() {
+    const reviewSection = document.querySelector('.review-section');
+    
+    // Update the review form HTML
+    reviewSection.innerHTML = `
+        <h3>Leave a Review</h3>
+        <div class="review-form">
+            <input type="text" id="reviewName" class="form-control" placeholder="Your Name" required>
+            <select id="reviewMovie" class="form-control" required>
+                <option value="">Select Movie</option>
+                ${document.getElementById('movie').innerHTML}
+            </select>
+            <div class="rating-input">
+                <span class="rating-label">Your Rating:</span>
+                <div class="stars">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+                <span class="rating-text">Click to rate</span>
+            </div>
+            <textarea id="reviewText" class="form-control" placeholder="Write your review here... (min. 20 characters)" required></textarea>
+            <div class="review-actions">
+                <button type="button" class="btn btn-primary review-btn" id="submitReview">Submit Review</button>
+                <button type="button" class="btn btn-secondary" id="clearReview">Clear</button>
+            </div>
+        </div>
+        <div class="reviews-stats">
+            <div class="overall-rating">
+                <h4>Overall Rating</h4>
+                <div class="big-rating">★ <span id="averageRating">0.0</span></div>
+                <div class="total-reviews">Based on <span id="totalReviews">0</span> reviews</div>
+            </div>
+            <div class="rating-bars">
+                <div class="rating-bar">
+                    <span>5 ★</span>
+                    <div class="bar-container">
+                        <div class="bar" id="bar5" style="width: 0%"></div>
+                    </div>
+                    <span class="bar-count" id="count5">0</span>
+                </div>
+                <!-- Repeat for 4-1 stars -->
+            </div>
+        </div>
+        <div class="reviews-filter">
+            <select id="filterRating" class="form-control">
+                <option value="all">All Ratings</option>
+                <option value="5">5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="2">2 Stars</option>
+                <option value="1">1 Star</option>
+            </select>
+            <select id="sortReviews" class="form-control">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="highest">Highest Rated</option>
+                <option value="lowest">Lowest Rated</option>
+            </select>
+        </div>
+        <div class="reviews-list" id="reviewsList"></div>
+    `;
+
+    // Add these styles to your CSS
+    const styles = `
+        .review-form {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .rating-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .stars {
+            font-size: 24px;
+            color: #ddd;
+            cursor: pointer;
+        }
+
+        .stars .star {
+            transition: color 0.2s;
+        }
+
+        .stars .star:hover,
+        .stars .star.active {
+            color: #ffcc00;
+        }
+
+        .rating-text {
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .reviews-stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .overall-rating {
+            text-align: center;
+        }
+
+        .big-rating {
+            font-size: 48px;
+            color: #ffcc00;
+        }
+
+        .rating-bars {
+            flex-grow: 1;
+            margin-left: 30px;
+        }
+
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+
+        .bar-container {
+            flex-grow: 1;
+            background: #444;
+            height: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            background: #ffcc00;
+            transition: width 0.3s ease;
+        }
+
+        .reviews-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .review-item {
+            position: relative;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+
+        .review-item:hover {
+            transform: translateX(10px);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .review-rating {
+            color: #ffcc00;
+        }
+
+        .review-date {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    `;
+
+    // Add the styles to the document
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+
+    // Initialize review functionality
+    let currentRating = 0;
+    const stars = document.querySelectorAll('.star');
+    const reviews = [];
+
+    // Star rating functionality
+    stars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const rating = this.dataset.rating;
+            highlightStars(rating);
+            document.querySelector('.rating-text').textContent = getRatingText(rating);
+        });
+
+        star.addEventListener('mouseout', function() {
+            highlightStars(currentRating);
+            document.querySelector('.rating-text').textContent = currentRating ? getRatingText(currentRating) : 'Click to rate';
+        });
+
+        star.addEventListener('click', function() {
+            currentRating = this.dataset.rating;
+            highlightStars(currentRating);
+            document.querySelector('.rating-text').textContent = getRatingText(currentRating);
+        });
+    });
+
+    // Submit review handler
+    document.getElementById('submitReview').addEventListener('click', function() {
+        const name = document.getElementById('reviewName').value;
+        const movie = document.getElementById('reviewMovie').value;
+        const text = document.getElementById('reviewText').value;
+
+        if (!validateReview(name, movie, text, currentRating)) {
+            return;
+        }
+
+        const review = {
+            name,
+            movie,
+            rating: currentRating,
+            text,
+            date: new Date(),
+            id: Date.now()
+        };
+
+        reviews.push(review);
+        addReviewToList(review);
+        updateReviewStats();
+        clearReviewForm();
+        
+        // Show success message
+        showNotification('Review submitted successfully!', 'success');
+    });
+
+    // Helper functions
+    function validateReview(name, movie, text, rating) {
+        if (!name || !movie || !text || !rating) {
+            showNotification('Please fill in all fields and provide a rating', 'error');
+            return false;
+        }
+        if (text.length < 20) {
+            showNotification('Review text must be at least 20 characters long', 'error');
+            return false;
+        }
+        return true;
+    }
+
+    function highlightStars(rating) {
+        stars.forEach(star => {
+            star.classList.toggle('active', star.dataset.rating <= rating);
+        });
+    }
+
+    function getRatingText(rating) {
+        const texts = {
+            1: 'Poor',
+            2: 'Fair',
+            3: 'Good',
+            4: 'Very Good',
+            5: 'Excellent'
+        };
+        return texts[rating] || 'Click to rate';
+    }
+
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    // Initialize the review system
+    updateReviewStats();
+}
+
+// Call this function when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeReviewSystem();
+});
+
+// Add these functions right after initializeReviewSystem()
+function addReviewToList(review) {
+    const reviewsList = document.getElementById('reviewsList');
+    const reviewElement = document.createElement('div');
+    reviewElement.className = 'review-item';
+    reviewElement.innerHTML = `
+        <div class="review-header">
+            <span class="review-author">${review.name}</span>
+            <div class="review-meta">
+                <span class="review-rating">
+                    ${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}
+                </span>
+                <span class="review-date">${formatDate(review.date)}</span>
+            </div>
+        </div>
+        <div class="review-movie">Movie: ${review.movie}</div>
+        <div class="review-text">${review.text}</div>
+    `;
+    reviewsList.insertBefore(reviewElement, reviewsList.firstChild);
+}
+
+function updateReviewStats() {
+    const reviews = Array.from(document.querySelectorAll('.review-item'));
+    const totalReviews = reviews.length;
+    
+    if (totalReviews === 0) {
+        document.getElementById('averageRating').textContent = '0.0';
+        document.getElementById('totalReviews').textContent = '0';
+        return;
+    }
+
+    // Calculate ratings distribution
+    const ratingCounts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+    let totalStars = 0;
+
+    reviews.forEach(review => {
+        const rating = review.querySelector('.review-rating').textContent.match(/★/g).length;
+        ratingCounts[rating]++;
+        totalStars += rating;
+    });
+
+    // Update average rating
+    const averageRating = (totalStars / totalReviews).toFixed(1);
+    document.getElementById('averageRating').textContent = averageRating;
+    document.getElementById('totalReviews').textContent = totalReviews;
+
+    // Update rating bars
+    Object.entries(ratingCounts).forEach(([rating, count]) => {
+        const percentage = (count / totalReviews) * 100;
+        const barElement = document.getElementById(`bar${rating}`);
+        if (barElement) {
+            barElement.style.width = `${percentage}%`;
+        }
+        const countElement = document.getElementById(`count${rating}`);
+        if (countElement) {
+            countElement.textContent = count;
+        }
+    });
+}
+
+function clearReviewForm() {
+    document.getElementById('reviewName').value = '';
+    document.getElementById('reviewMovie').value = '';
+    document.getElementById('reviewText').value = '';
+    const stars = document.querySelectorAll('.star');
+    stars.forEach(star => star.classList.remove('active'));
+    document.querySelector('.rating-text').textContent = 'Click to rate';
+    currentRating = 0;
+}
+
+function formatDate(date) {
+    const d = new Date(date);
+    return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// Add this CSS for better review display
+
+// Add this after your existing script
+const userAuth = {
+    // User authentication functions
+    async login(email, password) {
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (data.success) {
+                localStorage.setItem('userToken', data.token);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Login error:', error);
+            return false;
+        }
+    },
+
+    isLoggedIn() {
+        return !!localStorage.getItem('userToken');
+    },
+
+    logout() {
+        localStorage.removeItem('userToken');
+        window.location.href = '/login';
+    }
+};
+
+    </script>
+</body>
+</html>
